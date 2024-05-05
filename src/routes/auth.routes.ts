@@ -4,9 +4,11 @@ import express from "express";
 import { 
     register, 
     loginUsingEmailAndPassword,
+    verifyEmail,
+    verifyOtp,
 } from './../controllers/auth.controller';
 import { catchAsync } from "./../utils";
-import { createTokenAndSendToken } from "./../middlewares";
+import { authenticateToken, createTokenAndSendToken } from "./../middlewares";
 
 const router = express.Router(); 
 
@@ -17,5 +19,9 @@ router.get("/", (req, res) => {
 router.post("/register", catchAsync(register), catchAsync(createTokenAndSendToken)); 
 
 router.post("/login", catchAsync(loginUsingEmailAndPassword), catchAsync(createTokenAndSendToken));
+
+router.post('/verify-email', catchAsync(authenticateToken), catchAsync(verifyEmail)); 
+
+router.post('/verify-otp', catchAsync(authenticateToken), catchAsync(verifyOtp));
 
 export default router; 

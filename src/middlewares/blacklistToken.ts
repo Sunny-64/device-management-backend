@@ -33,6 +33,7 @@ async function blacklistToken(
                     throw new ApiError("Activity not found", 404);
                 }
                 activity.logged_out = true;
+                activity.logged_out_at = Date.now(); 
                 activity.token_deleted = true;
                 await activity.save();
             }
@@ -65,7 +66,10 @@ async function blacklistToken(
             }
 
             if (activity.token_deleted) {
+
                 activity.logged_out = true;
+                activity.logged_out_at = Date.now(); 
+
                 await activity.save();
                 const blacklist_token = new Blacklist({
                     token: token,
@@ -74,6 +78,8 @@ async function blacklistToken(
             } else {
                 activity.logged_out = true;
                 activity.token_deleted = true;
+                activity.logged_out_at = Date.now(); 
+                
                 await activity.save();
                 const blacklist_token = new Blacklist({
                     token: token,

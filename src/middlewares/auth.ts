@@ -12,10 +12,14 @@ async function authenticateToken(
     const authHeader = req.headers["authorization"];
 
     const bearer = authHeader && authHeader.split(" ")[0];
-    if (bearer != "Bearer") return res.sendStatus(401);
+    if (bearer != "Bearer") return res.status(401).json({
+        message : 'Unauthorized'
+    });
 
     const token = authHeader && authHeader.split(" ")[1];
-    if (token == null) return res.sendStatus(401);
+    if (token == null) return res.status(401).json({
+        message : 'Unauthorized'
+    });
 
     const isTokenBlacklisted = await Blacklist.findOne({ token: token });
     if (isTokenBlacklisted) {

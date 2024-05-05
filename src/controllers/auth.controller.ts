@@ -46,6 +46,7 @@ export const register = async (req: ICustomRequest, res: Response, next : NextFu
         register : true,
     }
     
+    sendOtp(saveUser._id, otpTypes.VERIFY_EMAIL);
     next(); 
 }
 
@@ -78,3 +79,51 @@ export const loginUsingEmailAndPassword = async (req: ICustomRequest, res: Respo
 }
 
 
+export const verifyEmail = async (req: ICustomRequest, res: Response) => {
+    const { otp } = req.body;
+
+    const userId = req.auth.id;
+
+    if (!otp) throw new ApiError("Invalid Otp", 400);
+
+    const fetchOtp = await Otp.findOne({ userId: userId }).sort({ createdAt: -1 });
+
+    if (!fetchOtp || fetchOtp.isVerified) throw new ApiError("OTP expired", 400); 
+
+    if (fetchOtp.otp !== otp || fetchOtp.otpType !== otpTypes.VERIFY_EMAIL) throw new ApiError("Invalid Request or OTP", 400); 
+    
+    // otp matched so find user and mark email verified true
+    const fetchUser = await User.findById(userId);
+
+    if (!fetchUser) throw new ApiError("User not found", 404); 
+
+    fetchUser.isEmailVerified = true;
+    fetchOtp.isVerified = true;
+    
+    await fetchOtp.save(); 
+    await fetchUser.save(); 
+    return res.status(200).json({ message: "Email verified" });
+}
+
+/**
+ * @description : Verifies Otp by checking if a user is valid and confirms the otp verification success
+ * @param Otp 
+ */
+export const verifyOtp = async (req:ICustomRequest, res:Response) => {
+    const {otp} = req.body; 
+    const userId = req.auth.id; 
+
+    const checkUser = await User.findById(userId); 
+
+    if(!checkUser) throw new ApiError("User not Found", 404); 
+
+    const checkOtp = await Otp.findOne({userId}).sort({createdAt : -1}); 
+
+    if(!checkOtp || checkOtp.isVerified) return res.status(400).json({message : "Otp expired"}); 
+
+    if(checkOtp.otpType !== otpTypes.RESET_PASSWORD ||otp !== checkOtp.otp) throw new ApiError("OTP did not match", 400); 
+
+    checkOtp.isVerified = true; 
+    await checkOtp.save(); 
+    return res.status(200).json({message : "Otp verified successfully"}); 
+}

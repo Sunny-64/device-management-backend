@@ -12,7 +12,7 @@ import { initializeSocket } from "./sockets";
 import { 
     errorHandler,
  } from './middlewares/'; 
-import { authRoutes } from "./routes";
+import { authRoutes, userRoutes } from "./routes";
 
 const app = express();
 
@@ -41,6 +41,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/auth', authRoutes); 
+app.use('/user', userRoutes);
 
 app.get("*", (req, res) => {
     res.status(404).json({

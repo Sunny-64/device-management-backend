@@ -12,10 +12,9 @@ export const getAllLogins = async (req:ICustomRequest,res:Response)=>{
         }); 
     }
     const userActivity = await ActivityLog.find({user_id: user._id, token_deleted : false});
-    console.log('data in req.auth : ',req.auth)
     res.status(200).json({
         success : 'ok', 
-        message : 'user activity fetched', 
+        message : 'Fetched all Active Devices', 
         data : userActivity
     }); 
 }

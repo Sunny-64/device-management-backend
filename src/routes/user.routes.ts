@@ -1,7 +1,7 @@
 import express from "express";
 
 import { catchAsync } from "./../utils";
-import {authenticateToken, blacklistToken} from "./../middlewares";
+import {authenticateToken, blacklistToken, requiredRole} from "./../middlewares";
 import { getAllLogins } from "./../controllers/user.controller";
 
 
@@ -11,6 +11,7 @@ router.get("/", (req, res) => {
     res.send("user routes");
 }); 
 
+
 router.delete("/logout", catchAsync(blacklistToken), (req, res) => {
     return res.status(200).json({
         success : 'ok', 
@@ -18,6 +19,8 @@ router.delete("/logout", catchAsync(blacklistToken), (req, res) => {
     }); 
 }); 
 
-router.get('/logins/show', catchAsync(authenticateToken), catchAsync(getAllLogins));
+router.get('/active-devices', catchAsync(authenticateToken), catchAsync(requiredRole('user')), catchAsync(getAllLogins));
+
+
 
 export default router; 

@@ -1,5 +1,4 @@
 import { Response } from "express";
-import ShortUniqueId from "short-unique-id";
 import jwt from "jsonwebtoken";
 import { ICustomRequest } from "./../types";
 import { ActivityLog } from "./../models";
@@ -23,7 +22,8 @@ export const createTokenAndSendToken = async (req: ICustomRequest, res:Response)
         user_id : req.auth.id,
         token_id : tokenId,
         ip_address : ip ,
-        device : req.headers["user-agent"]
+        device : req.headers["user-agent"], 
+        logged_in_at : Date.now()
     });
 
     await token.save();
