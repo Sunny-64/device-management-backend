@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { ActivityLog, User } from "./../models";
 import { ICustomRequest } from "./../types";
+import { ApiError } from "./../utils";
 
 export const getAllLogins = async (req:ICustomRequest,res:Response)=>{
  
@@ -30,3 +31,26 @@ export const getAllLogins = async (req:ICustomRequest,res:Response)=>{
     }); 
 }
 
+export const revokeDeviceAccess = async (req:ICustomRequest, res:Response) => {
+    const {tokenId} = req.params 
+
+    const doesActivityWithTokenExist = await ActivityLog.findOne({token_id : tokenId}); 
+
+    if(!doesActivityWithTokenExist) {
+        return res.status(400).json({
+            success : 'failed', 
+            message : `User with ${tokenId} not found`,
+        }); 
+    }
+
+    if(tokenId === req.auth.tokenId) throw new ApiError('Cannot revoke the current device please use logout', 400); 
+
+    doesActivityWithTokenExist.token_deleted = true; 
+    doesActivityWithTokenExist.logged_out_at = Date.now(); 
+    await doesActivityWithTokenExist.save();
+
+    return res.status(200).json({
+        success : 'ok',
+        message : 'access revoked successfully', 
+    });
+}

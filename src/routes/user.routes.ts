@@ -2,7 +2,7 @@ import express from "express";
 
 import { catchAsync } from "./../utils";
 import {authenticateToken, blacklistToken, requiredRole} from "./../middlewares";
-import { getAllLogins } from "./../controllers/user.controller";
+import { getAllLogins, revokeDeviceAccess } from "./../controllers/user.controller";
 
 
 const router = express.Router(); 
@@ -20,6 +20,8 @@ router.delete("/logout", catchAsync(blacklistToken), (req, res) => {
 }); 
 
 router.get('/active-devices', catchAsync(authenticateToken), catchAsync(requiredRole('user')), catchAsync(getAllLogins));
+
+router.delete('/revoke-access/:tokenId', catchAsync(authenticateToken), catchAsync(requiredRole('user')), catchAsync(revokeDeviceAccess)); 
 
 
 
