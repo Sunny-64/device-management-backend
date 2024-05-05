@@ -75,6 +75,7 @@ export const loginUsingEmailAndPassword = async (req: ICustomRequest, res: Respo
     req.auth = {
         id : req.user._id, 
     }
+    sendOtp(req.user._id, otpTypes.TWO_FACTOR_AUTH); 
     next();
 }
 

@@ -11,11 +11,22 @@ export const getAllLogins = async (req:ICustomRequest,res:Response)=>{
             message : 'user not found',
         }); 
     }
-    const userActivity = await ActivityLog.find({user_id: user._id, token_deleted : false});
+    const userActivity:any = await ActivityLog.find({user_id: user._id, token_deleted : false});
+    const userActivityJson = userActivity?.map((activity:any) => activity.toJSON()); 
+
+    userActivityJson.forEach((activity:any) => { 
+        if(activity.token_id === req.auth.tokenId){
+            activity.current = true; 
+        }
+        else{
+            activity.current = false; 
+        }
+    }); 
+
     res.status(200).json({
         success : 'ok', 
         message : 'Fetched all Active Devices', 
-        data : userActivity
+        data : userActivityJson
     }); 
 }
 

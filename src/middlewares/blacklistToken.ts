@@ -25,6 +25,7 @@ async function blacklistToken(
             token,
             process.env.ACCESS_TOKEN_SECRET!,
             async (err, payload: IAuth | any) => {
+                if(err) throw new ApiError('Invalid token', 400); 
                 const activity = await ActivityLog.findOne({
                     user_id: payload.id,
                     token_id: payload.tokenId,
@@ -48,11 +49,7 @@ async function blacklistToken(
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, async (err, payload:IAuth | any) => {
         if (err) {
-            return res.status(403).json({
-                success : 'failed', 
-                message : 'unauthorized', 
-                error : err
-            });
+            throw new ApiError('Unauthorized', 401); 
         }
 
         if (payload) {
