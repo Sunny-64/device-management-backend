@@ -12,6 +12,7 @@ import { initializeSocket } from "./sockets";
 import { 
     errorHandler,
  } from './middlewares/'; 
+import { authRoutes } from "./routes";
 
 const app = express();
 
@@ -32,16 +33,14 @@ app.use(cors({
     origin : "*", 
 })); 
 
-// initializeSocket(io);
-
 app.get("/", (req, res) => {
     res.status(200).json({
         success : true, 
         message : "Welcome"
     });
-})
+});
 
-
+app.use('/auth', authRoutes); 
 
 app.get("*", (req, res) => {
     res.status(404).json({
@@ -50,7 +49,6 @@ app.get("*", (req, res) => {
     })
 }); 
 
-// seed(); 
 app.use(errorHandler); 
 
 export {
