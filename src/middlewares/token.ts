@@ -2,6 +2,8 @@ import { Response } from "express";
 import jwt from "jsonwebtoken";
 import { ICustomRequest } from "./../types";
 import { ActivityLog } from "./../models";
+import { emitSocketEvent } from "./../sockets";
+import { socketEvents } from "./../configs";
 
 export const createTokenAndSendToken = async (req: ICustomRequest, res:Response) => {
     // unique token id
@@ -26,10 +28,14 @@ export const createTokenAndSendToken = async (req: ICustomRequest, res:Response)
         logged_in_at : Date.now()
     });
 
-    await token.save();
+    const saveToken = await token.save();
 
     const tokenUser = { id:req.auth.id , tokenId: tokenId  };
     const accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET!);
+
+    // emit a socket event whenever a new user loggs in.
+    emitSocketEvent(req, req.auth.id, socketEvents.NEW_DEVICE_LOGGED_IN, saveToken); 
+
     return res.status(200).json({
         success : 'ok',
         message : 'user found and logged in', 

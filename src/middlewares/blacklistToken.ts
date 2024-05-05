@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import { IAuth, ICustomRequest } from "./../types";
 import { BlacklistToken as Blacklist, ActivityLog } from "./../models";
 import { ApiError } from "./../utils";
+import { emitSocketEvent } from "./../sockets";
+import { socketEvents } from "./../configs";
 
 async function blacklistToken(
     req: ICustomRequest,
@@ -37,12 +39,14 @@ async function blacklistToken(
                 activity.logged_out_at = Date.now(); 
                 activity.token_deleted = true;
                 await activity.save();
+                emitSocketEvent(req, payload.id, socketEvents.DEVICE_LOGGED_OUT, '');
             }
         );
         const responseJson = {
             Status: "Failure",
             Details: "Token blacklisted. Cannot use this token.",
         };
+
 
         return res.status(401).json(responseJson);
     }
@@ -83,6 +87,8 @@ async function blacklistToken(
                 });
                 await blacklist_token.save();
             }
+
+            emitSocketEvent(req, payload.id, socketEvents.DEVICE_LOGGED_OUT, ''); 
         }
         next();
     });

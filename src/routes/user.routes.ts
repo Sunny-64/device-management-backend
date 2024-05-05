@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
 router.delete("/logout", catchAsync(blacklistToken), (req, res) => {
     return res.status(200).json({
         success : 'ok', 
-        message : 'user logged out',
+        message : 'user logged out', 
     }); 
 }); 
 

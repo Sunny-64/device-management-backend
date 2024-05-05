@@ -2,6 +2,8 @@ import { Response } from "express";
 import { ActivityLog, User } from "./../models";
 import { ICustomRequest } from "./../types";
 import { ApiError } from "./../utils";
+import { emitSocketEvent } from "./../sockets";
+import { socketEvents } from "./../configs";
 
 export const getAllLogins = async (req:ICustomRequest,res:Response)=>{
  
@@ -47,7 +49,9 @@ export const revokeDeviceAccess = async (req:ICustomRequest, res:Response) => {
 
     doesActivityWithTokenExist.token_deleted = true; 
     doesActivityWithTokenExist.logged_out_at = Date.now(); 
-    await doesActivityWithTokenExist.save();
+    const saveResult = await doesActivityWithTokenExist.save();
+
+    emitSocketEvent(req, req.auth.id, socketEvents.DEVICE_LOGGED_OUT, saveResult); 
 
     return res.status(200).json({
         success : 'ok',
