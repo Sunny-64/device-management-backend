@@ -33,6 +33,8 @@ app.use(cors({
     origin : "*", 
 })); 
 
+initializeSocket(io);
+
 app.get("/", (req, res) => {
     res.status(200).json({
         success : true, 
