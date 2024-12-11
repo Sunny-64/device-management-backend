@@ -4,7 +4,6 @@ import express from "express";
 import { 
     register, 
     loginUsingEmailAndPassword,
-    verifyEmail,
     verifyOtp,
 } from './../controllers/auth.controller';
 import { catchAsync } from "./../utils";
@@ -19,8 +18,6 @@ router.get("/", (req, res) => {
 router.post("/register", catchAsync(register), catchAsync(createTokenAndSendToken)); 
 
 router.post("/login", catchAsync(loginUsingEmailAndPassword), catchAsync(createTokenAndSendToken));
-
-router.post('/verify-email', catchAsync(authenticateToken), catchAsync(verifyEmail)); 
 
 router.post('/verify-otp', catchAsync(authenticateToken), catchAsync(verifyOtp));
 
